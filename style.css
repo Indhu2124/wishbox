@@ -1,0 +1,262 @@
+/* ============================================
+   WishBox — Black & Gold Love Letter
+   Palette:
+     --ink       #0b0908   near-black backdrop
+     --charcoal  #171310   warm dark panel
+     --gold      #c9a24b   antique gold
+     --gold-lt   #eccf87   bright gold highlight
+     --wine      #5c1a2b   deep rose-wine (seal/hearts)
+     --wine-lt   #8a3049   lighter wine for glow
+     --cream     #f3e9da   warm off-white text
+   ============================================ */
+
+:root {
+  --ink: #0b0908;
+  --charcoal: #171310;
+  --gold: #c9a24b;
+  --gold-lt: #eccf87;
+  --wine: #5c1a2b;
+  --wine-lt: #8a3049;
+  --cream: #f3e9da;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: radial-gradient(ellipse at 50% -10%, #221c17 0%, var(--ink) 55%);
+  color: var(--cream);
+  font-family: 'Cormorant Garamond', serif;
+  overflow-x: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+/* ---------- Ambient floating hearts ---------- */
+.heart-field {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.ember-heart {
+  position: absolute;
+  bottom: -40px;
+  color: var(--gold);
+  opacity: 0;
+  font-size: 16px;
+  animation: rise linear infinite;
+  filter: drop-shadow(0 0 6px rgba(201,162,75,0.5));
+}
+@keyframes rise {
+  0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.55; }
+  90%  { opacity: 0.35; }
+  100% { transform: translateY(-110vh) translateX(var(--drift, 20px)) rotate(20deg); opacity: 0; }
+}
+
+/* ---------- Layout ---------- */
+.stage {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+}
+
+.eyebrow, .letter-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--gold);
+  margin: 0 0 10px;
+}
+
+/* ---------- Sealed / envelope state ---------- */
+.seal-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: fadeIn 1s ease both;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity:1; transform:none; } }
+
+.recipient {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(32px, 6vw, 52px);
+  margin: 0 0 40px;
+  color: var(--gold-lt);
+  text-shadow: 0 0 24px rgba(236,207,135,0.25);
+}
+
+.envelope {
+  position: relative;
+  width: min(320px, 78vw);
+  aspect-ratio: 3 / 2;
+  margin-bottom: 34px;
+  cursor: pointer;
+  perspective: 800px;
+}
+.envelope-back {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(155deg, #241c16, var(--charcoal));
+  border: 1px solid rgba(201,162,75,0.35);
+  border-radius: 6px;
+}
+.envelope-front {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 100%;
+  background: linear-gradient(155deg, #2a2118, #1c1712);
+  clip-path: polygon(0 0, 50% 42%, 100% 0, 100% 100%, 0 100%);
+  border-radius: 0 0 6px 6px;
+  border: 1px solid rgba(201,162,75,0.25);
+  border-top: none;
+  z-index: 2;
+}
+.envelope-flap {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 55%;
+  background: linear-gradient(155deg, #322619, #1c1712);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  transform: rotateX(0deg);
+  transition: transform 0.7s cubic-bezier(.6,-0.1,.2,1.4);
+  border: 1px solid rgba(201,162,75,0.3);
+  z-index: 3;
+}
+.envelope.open .envelope-flap {
+  transform: rotateX(180deg);
+  z-index: 1;
+}
+
+.wax-seal {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 46px; height: 46px;
+  transform: translate(-50%, -46%);
+  background: radial-gradient(circle at 35% 30%, var(--wine-lt), var(--wine) 70%);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.4);
+  z-index: 4;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+.wax-seal span {
+  color: var(--gold-lt);
+  font-size: 16px;
+  transform: translateY(-1px);
+}
+.envelope.open .wax-seal {
+  opacity: 0;
+  transform: translate(-50%, -46%) scale(0.4);
+}
+.envelope:not(.open):hover .wax-seal { transform: translate(-50%, -46%) scale(1.08); }
+
+.open-btn, .surprise-btn {
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 0.08em;
+  font-size: 14px;
+  color: var(--ink);
+  background: linear-gradient(120deg, var(--gold-lt), var(--gold));
+  border: none;
+  padding: 13px 30px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(201,162,75,0.25);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.open-btn:hover, .surprise-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(201,162,75,0.35);
+}
+
+/* ---------- Letter state ---------- */
+.letter-view {
+  display: none;
+  width: 100%;
+  justify-content: center;
+}
+.letter-view.show {
+  display: flex;
+  animation: riseIn 0.9s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(36px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.letter-card {
+  position: relative;
+  max-width: 560px;
+  width: 100%;
+  background: linear-gradient(170deg, #1b1610, var(--charcoal));
+  border: 1px solid rgba(201,162,75,0.3);
+  border-radius: 4px;
+  padding: clamp(28px, 6vw, 56px);
+  text-align: center;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.55);
+}
+.letter-card::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgba(201,162,75,0.18);
+  pointer-events: none;
+}
+
+.letter-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: clamp(30px, 5.5vw, 44px);
+  margin: 0 0 22px;
+  color: var(--gold-lt);
+}
+
+.letter-body {
+  font-size: clamp(18px, 2.6vw, 21px);
+  line-height: 1.75;
+  color: #ece1d1;
+  margin: 0 0 28px;
+}
+
+.letter-signoff {
+  font-style: italic;
+  font-size: 18px;
+  color: var(--gold);
+  margin: 0 0 34px;
+  line-height: 1.6;
+}
+.letter-signoff span { color: var(--gold-lt); }
+
+.surprise-line {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  color: var(--gold-lt);
+  margin-top: 18px;
+  min-height: 20px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.surprise-line.show { opacity: 1; }
+
+/* Focus visibility for keyboard users */
+button:focus-visible, .envelope:focus-visible {
+  outline: 2px solid var(--gold-lt);
+  outline-offset: 3px;
+}
